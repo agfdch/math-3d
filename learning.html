@@ -142,21 +142,7 @@ summary{cursor:pointer;font-weight:700;color:var(--cyan);min-height:32px}
         <canvas id="cv" tabindex="0" aria-label="3D 정육면체. 마우스나 손가락으로 끌거나 화살표 키로 돌릴 수 있어요."></canvas>
         <div id="noThree" class="nothree" hidden>3D 화면을 불러오지 못했어요. 인터넷 연결이나 기기 설정 때문일 수 있어요. 오른쪽(또는 아래)의 2D 그림과 설명으로 계속 학습할 수 있어요.</div>
       </div>
-      <div class="viewbtns only3d" role="group" aria-label="3D 시점 돌리기">
-        <button type="button" class="ghost" data-rot="l" aria-label="왼쪽으로 돌리기">◀</button>
-        <button type="button" class="ghost" data-rot="r" aria-label="오른쪽으로 돌리기">▶</button>
-        <button type="button" class="ghost" data-rot="u" aria-label="위로 돌리기">▲</button>
-        <button type="button" class="ghost" data-rot="d" aria-label="아래로 돌리기">▼</button>
-        <span>끌어서 돌려도 돼요</span>
-      </div>
-      <ul class="legend" aria-label="면의 색 안내">
-        <li><span class="dot" style="background:#ff5d73"></span>오른쪽 면</li>
-        <li><span class="dot" style="background:#ff9f43"></span>왼쪽 면</li>
-        <li><span class="dot" style="background:#3ddc84"></span>윗면</li>
-        <li><span class="dot" style="background:#4de8e0"></span>아랫면</li>
-        <li><span class="dot" style="background:#4da3ff"></span>앞면</li>
-        <li><span class="dot" style="background:#b48cff"></span>뒷면</li>
-      </ul>
+      <p class="hint only3d" style="margin:8px 0 0">👆 마우스나 손가락으로 끌면 돌아가요. 분홍색이 단면이에요.</p>
     </div>
 
     <div class="ctrl-col">
@@ -176,25 +162,21 @@ summary{cursor:pointer;font-weight:700;color:var(--cyan);min-height:32px}
         <div class="pos"><span>한쪽 끝</span><span id="posTxt">가운데 (0)</span><span>반대쪽 끝</span></div>
       </div>
 
-      <label class="toggle only3d"><input id="expl" type="checkbox"> 잘린 조각 떼어 보기</label>
-
       <div class="row">
-        <button id="sweepBtn" type="button">▶ 칼 자동 이동</button>
-        <button id="pauseBtn" type="button" class="ghost">⏸ 움직임 멈추기</button>
+        <button id="pauseBtn" type="button" class="ghost only3d">⏸ 회전 멈추기</button>
         <button id="resetBtn" type="button" class="ghost">↺ 처음으로</button>
       </div>
 
       <div class="readout" id="readout">
         <div><span>칼이 지나간 면</span><b><span id="rFaces">-</span>개</b></div>
-        <div class="facelist" id="rFaceList"></div>
         <div><span>단면의 모양</span><b id="rShape">-</b></div>
         <div><span>단면의 넓이</span><b><span id="rArea">-</span> cm²</b></div>
         <p class="rule">규칙: 단면의 변의 수 = 칼이 지나간 면의 수</p>
       </div>
 
       <div class="sec2d">
-        <svg id="sec2d" viewBox="0 0 240 240" role="img" aria-label="현재 단면을 2D로 그린 그림. 변의 색은 그 변이 놓인 면의 색이에요."></svg>
-        <p class="hint" style="flex:1;min-width:150px">2D 그림: 변의 색깔은 그 변이 놓인 면의 색이에요. 색이 몇 가지인지 세어 보세요!</p>
+        <svg id="sec2d" viewBox="0 0 240 240" role="img" aria-label="현재 단면을 2D로 그린 그림"></svg>
+        <p class="hint" style="flex:1;min-width:150px">2D 그림: 단면의 변이 몇 개인지 세어 보세요!</p>
       </div>
 
       <p style="margin:12px 0 2px"><b>모은 단면</b> <span class="hint">(한 번이라도 나오면 불이 켜져요)</span></p>
@@ -207,7 +189,7 @@ summary{cursor:pointer;font-weight:700;color:var(--cyan);min-height:32px}
     <summary>계산 검산 예시 보기</summary>
     <p>방향 <b>꼭짓점 쪽으로</b>, 칼 위치 <b>0(가운데)</b> → 단면은 정육각형이에요. 칼이 여섯 모서리의 가운데 점을 지나므로, 정육각형의 한 변은 정사각형 한 면의 대각선의 절반이에요.</p>
     <p>한 변 = 6√2 ÷ 2 = 3√2 cm<br>넓이 = 6 × (√3/4) × (3√2)² = 6 × (√3/4) × 18 = 27√3 ≈ <b>46.8 cm²</b></p>
-    <div class="row"><button id="calcBtn" type="button" class="ghost">이 값이 화면에도 나오는지 보기</button></div>
+    <p class="hint">실험에서 방향 <b>꼭짓점 쪽으로</b>, 슬라이더 <b>0</b>에 맞추면 화면에도 46.8 cm²가 나와요.</p>
   </details>
 </section>
 
@@ -406,12 +388,9 @@ function updateReadout(){
   var cs=S.cs, s=sEff();
   $('posTxt').textContent=(s===0?'가운데 (0)':(s>0?'+'+s:''+s));
   if(!cs.n){
-    $('rFaces').textContent='0';$('rFaceList').innerHTML='';$('rShape').textContent='닿지 않아요';$('rArea').textContent='-';return;
+    $('rFaces').textContent='0';$('rShape').textContent='닿지 않아요';$('rArea').textContent='-';return;
   }
   $('rFaces').textContent=cs.n;
-  var seen={},html='';
-  for(var i=0;i<cs.faces.length;i++){var f=cs.faces[i];if(f>=0&&!seen[f]){seen[f]=1;html+='<span><span class="dot" style="background:'+FACE_HEX[f]+'"></span>'+FACE_NAMES[f]+'</span>';}}
-  $('rFaceList').innerHTML=html;
   var info=cs.info,t=info.name;
   if(info.key==='pent')t+=' (정오각형은 아니에요)';
   if(info.key==='hex')t+=' (정육각형은 아니에요)';
@@ -424,8 +403,8 @@ function updateSvg(){
   var sc=62,cx=120,cy=120,P=[],i;
   for(i=0;i<cs.n;i++){var q=vsub(cs.pts[i],cs.c);P.push([cx+dot(q,cs.u)*sc,cy-dot(q,cs.v)*sc]);}
   var h='<polygon points="'+P.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="rgba(255,61,127,.35)"/>';
-  for(i=0;i<cs.n;i++){var a=P[i],b=P[(i+1)%cs.n],f=cs.faces[i];
-    h+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="'+(f>=0?FACE_HEX[f]:'#fff')+'" stroke-width="6" stroke-linecap="round"/>';}
+  for(i=0;i<cs.n;i++){var a=P[i],b=P[(i+1)%cs.n];
+    h+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="#ff3d7f" stroke-width="5" stroke-linecap="round"/>';}
   for(i=0;i<cs.n;i++)h+='<circle cx="'+P[i][0].toFixed(1)+'" cy="'+P[i][1].toFixed(1)+'" r="3.5" fill="#fff"/>';
   svg.innerHTML=h;
 }
@@ -473,26 +452,19 @@ function init3D(){
     pUp=new T.Plane(new T.Vector3(0,1,0),0);
     var box=new T.BoxGeometry(2,2,2);
     var edgesGeo=new T.EdgesGeometry(box);
-    var lowMats=[],upMats=[];
-    for(var i=0;i<6;i++){
-      var c=new T.Color(FACE_HEX[i]);
-      var dim=c.clone().multiplyScalar(0.62);
-      lowMats.push(new T.MeshLambertMaterial({color:dim,clippingPlanes:[pLow]}));
-      upMats.push(new T.MeshLambertMaterial({color:dim,transparent:true,opacity:0.22,depthWrite:false,side:T.DoubleSide,clippingPlanes:[pUp]}));
-      matFace.push(new T.MeshBasicMaterial({color:c}));
-    }
+    var lowMat=new T.MeshLambertMaterial({color:0x6f86b8,clippingPlanes:[pLow]});
+    var upMat=new T.MeshLambertMaterial({color:0x6f86b8,transparent:true,opacity:0.2,depthWrite:false,side:T.DoubleSide,clippingPlanes:[pUp]});
     matWhite=new T.MeshBasicMaterial({color:0xffffff});
     lowerG=new T.Group();upperG=new T.Group();
-    lowerG.add(new T.Mesh(box,lowMats));
+    lowerG.add(new T.Mesh(box,lowMat));
     lowerG.add(new T.LineSegments(edgesGeo,new T.LineBasicMaterial({color:0xffffff,clippingPlanes:[pLow]})));
-    upperG.add(new T.Mesh(box,upMats));
+    upperG.add(new T.Mesh(box,upMat));
     upperG.add(new T.LineSegments(edgesGeo,new T.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.55,clippingPlanes:[pUp]})));
     scene.add(lowerG);scene.add(upperG);
 
     var kg=new T.PlaneGeometry(4.2,4.2);
     knife=new T.Group();
-    knife.add(new T.Mesh(kg,new T.MeshBasicMaterial({color:0xffd23f,transparent:true,opacity:0.14,side:T.DoubleSide,depthWrite:false})));
-    knife.add(new T.LineSegments(new T.EdgesGeometry(kg),new T.LineBasicMaterial({color:0xffd23f})));
+    knife.add(new T.Mesh(kg,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.07,side:T.DoubleSide,depthWrite:false})));
     scene.add(knife);
 
     geoCyl=new T.CylinderGeometry(0.045,0.045,1,8);
@@ -528,11 +500,7 @@ function fillCap(g){
   geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));
   var fan=new T.Mesh(geo,new T.MeshBasicMaterial({color:0xff3d7f,side:T.DoubleSide,transparent:true,opacity:0.92,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
   fan.userData.own=true;g.add(fan);
-  for(i=0;i<cs.n;i++){
-    var f=cs.faces[i];
-    g.add(edgeMesh(cs.pts[i],cs.pts[(i+1)%cs.n],f>=0?matFace[f]:matWhite));
-    var s=new T.Mesh(geoSph,matWhite);s.position.set(cs.pts[i][0],cs.pts[i][1],cs.pts[i][2]);g.add(s);
-  }
+  for(i=0;i<cs.n;i++)g.add(edgeMesh(cs.pts[i],cs.pts[(i+1)%cs.n],matWhite));
 }
 function update3D(force){
   if(!ready||!S.P)return;
@@ -571,8 +539,7 @@ function rotate(dx,dy){
 /* ---------- 움직임 루프 ---------- */
 var last=performance.now();
 function setPauseLabel(){
-  $('pauseBtn').textContent=(S.spin||S.sweep)?'⏸ 움직임 멈추기':'▶ 회전 다시 켜기';
-  $('sweepBtn').textContent=S.sweep?'■ 자동 이동 끄기':'▶ 칼 자동 이동';
+  $('pauseBtn').textContent=S.spin?'⏸ 회전 멈추기':'▶ 회전 켜기';
 }
 function tick(now){
   requestAnimationFrame(tick);
@@ -606,23 +573,8 @@ function bind(){
   var rs=document.getElementsByName('dir'),i;
   for(i=0;i<rs.length;i++)rs[i].addEventListener('change',function(e){S.dir=+e.target.value;changed();update3D(true);});
   $('sl').addEventListener('input',function(e){if(S.sweep)stopSweep();S.s=+e.target.value;changed();update3D();});
-  $('expl').addEventListener('change',function(e){S.explode=e.target.checked;});
-  $('sweepBtn').addEventListener('click',function(){S.sweep=!S.sweep;if(S.sweep)S.s=+$('sl').value;setPauseLabel();});
-  $('pauseBtn').addEventListener('click',function(){
-    if(S.spin||S.sweep){S.spin=false;S.sweep=false;}else{S.spin=true;}
-    setPauseLabel();
-  });
+  $('pauseBtn').addEventListener('click',function(){S.spin=!S.spin;setPauseLabel();});
   $('resetBtn').addEventListener('click',resetLab);
-  $('calcBtn').addEventListener('click',function(){
-    if(!S.unlocked){alert('먼저 위에서 답을 고르고 [실험 시작]을 눌러 주세요.');return;}
-    S.dir=2;S.s=0;S.sweep=false;setDirRadio(2);$('sl').value=0;setPauseLabel();changed();update3D(true);
-    $('readout').scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
-  });
-  var vb=document.querySelectorAll('[data-rot]');
-  for(i=0;i<vb.length;i++)vb[i].addEventListener('click',function(e){
-    var k=e.currentTarget.getAttribute('data-rot');
-    rotate(k==='l'?-0.3:k==='r'?0.3:0,k==='u'?-0.25:k==='d'?0.25:0);
-  });
   var cv=$('cv'),lx=0,ly=0;
   cv.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;ly=e.clientY;try{cv.setPointerCapture(e.pointerId);}catch(_){}});
   cv.addEventListener('pointermove',function(e){if(!dragging)return;rotate(-(e.clientX-lx)*0.01,-(e.clientY-ly)*0.01);lx=e.clientX;ly=e.clientY;});
@@ -667,7 +619,7 @@ function bind(){
 }
 function resetLab(){
   S.dir=0;S.s=0;S.sweep=false;S.explode=false;S.exp=0;S.spin=!reduce;S.found={};
-  setDirRadio(0);$('sl').value=0;$('expl').checked=false;
+  setDirRadio(0);$('sl').value=0;
   orbit.theta=0.75;orbit.phi=1.05;orbit.dirty=true;
   setPauseLabel();changed();update3D(true);
 }
