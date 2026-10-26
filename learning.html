@@ -3,248 +3,298 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2B2A4C">
 <title>정육면체를 한 번 자르면? 단면 탐험</title>
 <style>
 :root{
-  --bg:#2A1630; --panel:#3A2144; --panel2:#2f1b38; --gold:#C9963B; --pink:#FF3D7F;
-  --cyan:#4DE8E0; --yellow:#FFD23F; --green:#3DDC84; --text:#F7F0FA; --muted:#CDBBD8; --line:#5a3a66;
+  --bg:#2B2A4C; --panel:#35335C; --panel2:#25243F; --line:rgba(201,182,228,.35);
+  --pink:#FFB6C9; --rose:#F79CB8; --gold:#E8C468; --lav:#C9B6E4; --text:#FFF9FB; --muted:#C9B6E4;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);line-height:1.65;font-size:16px;
-  font-family:"Pretendard","Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;word-break:keep-all}
-.top{padding:22px 16px 6px;max-width:1100px;margin:0 auto}
-.tag{display:inline-block;background:var(--pink);color:#fff;font-weight:700;font-size:14px;padding:2px 10px;border-radius:999px}
-h1{font-size:clamp(24px,5vw,36px);line-height:1.25;margin:10px 0 4px}
-h1 span{color:var(--yellow)}
-.sub{margin:0;color:var(--muted)}
-.wrap{max-width:1100px;margin:0 auto;padding:12px 16px 40px;display:grid;gap:16px}
-.card{background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:16px}
-.card h2{margin:0 0 8px;font-size:clamp(19px,3.5vw,24px);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.step{background:var(--yellow);color:#2A1630;font-size:13px;font-weight:800;padding:2px 9px;border-radius:6px;letter-spacing:.02em}
-p{margin:.4em 0}
-.hint{color:var(--muted);font-size:15px}
-.word{color:var(--cyan);font-weight:700}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);line-height:1.6;font-size:16px;
+  font-family:"Pretendard","Noto Sans KR","Noto Sans CJK KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;word-break:keep-all;-webkit-text-size-adjust:100%}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.top{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;padding:8px 14px 6px;max-width:1280px;margin:0 auto;width:100%;flex:none}
+.tag{background:var(--pink);color:#2B2A4C;font-weight:800;font-size:13px;padding:2px 10px;border-radius:999px}
+h1{font-size:clamp(17px,2.8vw,24px);line-height:1.3;margin:0}
+h1 span{color:var(--gold)}
+.sub{margin:0;color:var(--muted);font-size:14px}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:12px;padding:0 14px 12px;max-width:1280px;margin:0 auto;width:100%}
+.left{display:flex;flex-direction:column;gap:6px;min-height:0;min-width:0}
+.stage{position:relative;flex:1;min-height:0;border-radius:14px;border:2px solid var(--line);
+  background:radial-gradient(circle at 50% 42%,#3d3b6b,#1f1e38);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+@media(max-width:759px){
+  .main{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:8px;padding:0 10px 8px}
+  .stage{flex:none;height:38dvh;min-height:210px}
+  .sub,.desk{display:none}
+}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
+.stage canvas:active{cursor:grabbing}
+.stage .tip{position:absolute;left:12px;bottom:26px;font-size:12px;color:var(--muted);pointer-events:none}
+.stage .note{position:absolute;left:12px;bottom:6px;right:128px;margin:0;font-size:11px;line-height:1.35;color:var(--muted);pointer-events:none}
+.sec2d{position:absolute;right:8px;bottom:8px;width:104px;height:104px;background:rgba(37,36,63,.85);border:2px solid var(--line);border-radius:10px}
+.nothree{position:static;text-align:center;padding:14px;color:var(--muted);max-width:420px}
+.no3d .stage .sec2d{position:static;width:min(62%,240px);height:auto;aspect-ratio:1}
+.no3d .stage .tip{display:none}
+.app[data-step="1"] .labonly{display:none}
+.readout{position:absolute;top:8px;left:8px;right:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;pointer-events:none}
+.readout div{background:rgba(37,36,63,.86);border:2px solid var(--line);border-radius:10px;padding:3px 9px;min-width:0}
+.readout small{display:block;color:var(--muted);font-size:12px;line-height:1.25}
+.readout b{display:block;color:var(--gold);font-size:16px;line-height:1.3}
+.rule{margin:2px 0 6px;color:var(--pink);font-weight:700;font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0;list-style:none;align-items:center;flex:none}
+.chips .lbl{color:var(--muted);font-size:12px;margin-right:2px;white-space:nowrap}
+.chips li.c{border:2px dashed var(--line);border-radius:999px;padding:0 8px;font-size:12px;line-height:1.5;color:var(--muted);white-space:nowrap}
+.chips li.on{border:2px solid var(--gold);color:var(--text);background:rgba(232,196,104,.16)}
+.chips li.lock{border-color:var(--rose);color:var(--pink)}
+.right{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0}
+.steps{display:flex;gap:6px;margin:0;padding:0;list-style:none}
+.steps li{flex:1;text-align:center;font-size:13px;font-weight:700;color:var(--muted);border-bottom:4px solid var(--line);padding-bottom:3px}
+.steps li.cur{color:var(--gold);border-color:var(--gold)}
+.steps li.done{color:var(--text);border-color:var(--pink)}
+.panelwrap{flex:1;min-height:0;overflow:auto;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+.panelwrap h2{margin:0 0 6px;font-size:clamp(18px,2.6vw,21px);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.step{background:var(--gold);color:#2B2A4C;font-size:12px;font-weight:800;padding:1px 8px;border-radius:6px}
+p{margin:.35em 0}
+.hint{color:var(--muted);font-size:14px}
+.word{color:var(--pink);font-weight:700}
 fieldset{border:0;padding:0;margin:0;min-width:0}
-fieldset:disabled{opacity:.5}
-legend{font-weight:700;padding:0;margin-bottom:6px}
-.choices{display:grid;gap:8px;margin:8px 0}
-.choices label{display:flex;gap:10px;align-items:flex-start;background:var(--panel2);border:2px solid var(--line);
-  border-radius:10px;padding:10px 12px;cursor:pointer;min-height:48px}
-.choices input{margin-top:5px;accent-color:var(--pink);width:20px;height:20px;flex:none}
-.choices label:has(input:checked){border-color:var(--yellow);background:#43264d}
-button{font:inherit;font-weight:700;color:#2A1630;background:var(--yellow);border:2px solid var(--gold);
-  border-radius:10px;padding:10px 16px;min-height:46px;cursor:pointer}
-button.ghost{background:var(--panel2);color:var(--text);border-color:var(--line)}
+fieldset:disabled{opacity:.55}
+legend{font-weight:700;padding:0;margin-bottom:4px}
+.choices{display:grid;gap:8px;grid-template-columns:1fr 1fr;margin:8px 0}
+.choices label{display:flex;gap:8px;align-items:center;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;min-height:46px}
+.choices input{accent-color:var(--pink);width:20px;height:20px;flex:none;margin:0}
+.choices label:has(input:checked){border-color:var(--gold);background:#3b3866}
+.sit{display:flex;gap:12px;align-items:center}
+.sit svg{width:128px;height:auto;flex:none;background:var(--panel2);border:2px solid var(--line);border-radius:10px}
+button{font:inherit;font-weight:700;color:#2B2A4C;background:var(--gold);border:2px solid var(--gold);border-radius:10px;padding:8px 16px;min-height:44px;cursor:pointer}
+button.ghost{background:transparent;color:var(--text);border-color:var(--line)}
 button:hover:not(:disabled){filter:brightness(1.08)}
 button:disabled{opacity:.45;cursor:not-allowed}
-:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-figure{margin:10px 0}
-figure svg{width:100%;max-width:320px;height:auto;display:block;background:var(--panel2);border-radius:10px;border:2px solid var(--line)}
-figcaption{color:var(--muted);font-size:14px;margin-top:4px}
-.lab{display:grid;gap:14px;grid-template-columns:1fr}
-@media(min-width:880px){.lab{grid-template-columns:1.1fr 1fr;align-items:start}.stage-col{position:sticky;top:10px}}
-.stage{position:relative;width:100%;aspect-ratio:1/1;max-height:520px;border-radius:12px;border:2px solid var(--line);
-  background:radial-gradient(circle at 50% 40%,#4a2a57,#241229)}
-.stage canvas{width:100%;height:100%;display:block;border-radius:10px;touch-action:pan-y;cursor:grab}
-.stage canvas:active{cursor:grabbing}
-.nothree{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;color:var(--muted)}
-.nothree[hidden]{display:none}
-.viewbtns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
-.viewbtns button{min-width:46px;padding:8px 12px}
-.viewbtns span{color:var(--muted);font-size:14px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin:8px 0 0;padding:0;list-style:none;font-size:14px}
-.dot{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.dirs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px}
-.dirs label{display:block;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer;min-height:48px}
+.dirs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
+.dirs label{display:block;background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:6px 10px;cursor:pointer;min-height:48px}
 .dirs input{position:absolute;opacity:0;pointer-events:none}
-.dirs label:has(input:checked){border-color:var(--yellow);background:#43264d}
-.dirs label:has(input:focus-visible){outline:3px solid var(--cyan)}
-.dirs b{display:block;font-size:15px}
-.dirs small{color:var(--muted);font-size:13px}
-.slider{margin:6px 0 10px}
-.slider input[type=range]{width:100%;height:36px;accent-color:var(--pink)}
-.slider .pos{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}
-.toggle{display:flex;gap:8px;align-items:center;margin:6px 0}
-.toggle input{width:20px;height:20px;accent-color:var(--pink)}
-.readout{background:var(--panel2);border:2px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px}
-.readout div{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.readout b{color:var(--yellow)}
-.rule{margin:8px 0 0;color:var(--cyan);font-weight:700}
-.sec2d{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px}
-.sec2d svg{width:200px;height:200px;background:var(--panel2);border:2px solid var(--line);border-radius:10px;flex:none}
-.facelist{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px;color:var(--muted)}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0;padding:0;list-style:none}
-.chips li{border:2px dashed var(--line);border-radius:999px;padding:2px 10px;font-size:14px;color:var(--muted)}
-.chips li.on{border:2px solid var(--green);color:#fff;background:#1f4d35}
-.chips li.lock{border-color:var(--pink);color:#ffc2d6}
-.panel{background:var(--panel2);border:2px solid var(--green);border-radius:10px;padding:12px 14px;margin-top:10px}
-.panel[hidden]{display:none}
-.panel h3{margin:0 0 4px;font-size:18px;color:var(--green)}
-.panel ul{margin:6px 0;padding-left:20px}
-.panel li{margin:4px 0}
-.note{font-size:14px;color:var(--muted);border-top:1px dashed var(--line);margin-top:10px;padding-top:8px}
-details{margin-top:10px}
-summary{cursor:pointer;font-weight:700;color:var(--cyan);min-height:32px}
+.dirs label:has(input:checked){border-color:var(--gold);background:#3b3866}
+.dirs label:has(input:focus-visible){outline:3px solid var(--pink)}
+.dirs b{display:block;font-size:15px;line-height:1.3}
+.dirs small{color:var(--muted);font-size:13px;line-height:1.3;display:block}
+.slider input[type=range]{width:100%;height:34px;accent-color:var(--pink);margin:2px 0}
+.slider .pos{display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+.ans{background:var(--panel2);border:2px solid var(--gold);border-radius:10px;padding:8px 12px;margin:8px 0}
+.ans h3{margin:0;font-size:18px;color:var(--gold)}
+ul.tight{margin:4px 0;padding-left:20px}
+ul.tight li{margin:3px 0}
+details{margin-top:8px}
+summary{cursor:pointer;font-weight:700;color:var(--pink);min-height:30px}
 .no3d .only3d{display:none}
-.sr{position:absolute;left:-9999px}
+@media(max-width:759px){
+  .chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  .stage .note{right:96px;font-size:10.5px}
+  .stage .tip{display:none}
+  .sec2d{width:80px;height:80px}
+  .readout small{font-size:11px}.readout b{font-size:14px}
+  .dirs{grid-template-columns:1fr 1fr;gap:6px;margin:2px 0 6px}
+  .dirs small{display:none}
+  .dirs label{min-height:40px;padding:6px 10px}
+  .slider input[type=range]{height:30px}
+  .panelwrap{padding:10px 12px}
+  .panelwrap h2{margin-bottom:4px}
+  .row{margin-top:6px;gap:6px}
+  .row button{padding:6px 10px;min-height:42px;font-size:14px}
+  .sit svg{width:84px}.sit{gap:10px}
+  .steps li{font-size:12px}
+}
+@media(max-width:759px){
+  .panelwrap{font-size:15px}
+  .panelwrap h2{font-size:17px}
+  .app[data-step="3"] .panelwrap legend,.app[data-step="3"] .slider .hint{display:none}
+  .app[data-step="3"] .rule{font-size:13px;margin:0 0 4px}
+  body:not(.no3d) .sit svg{display:none}
+  .app[data-step="4"] .stage,.app[data-step="5"] .stage{height:24dvh;min-height:140px}
+  .app[data-step="4"] .readout,.app[data-step="5"] .readout,.app[data-step="4"] .sec2d,.app[data-step="5"] .sec2d,.app[data-step="4"] .stage .note,.app[data-step="5"] .stage .note{display:none}
+}
+@media(max-width:759px){
+  .app[data-step="1"] .stage{height:27dvh;min-height:150px}
+}
+@media(min-width:760px) and (max-height:480px){
+  .top .tag,.top .sub,.steps,.panelwrap h2,.desk,.rule{display:none}
+  .top{padding:4px 12px 2px}
+  .main{gap:8px;padding:0 10px 6px}
+  .dirs{grid-template-columns:repeat(4,1fr);gap:6px}
+  .dirs b{font-size:13px}
+  .dirs label{padding:4px 6px;min-height:38px}
+  .panelwrap legend{display:none}
+  .readout small{font-size:11px}.readout b{font-size:14px}
+  .sec2d{width:80px;height:80px}
+  .stage .note{right:96px;font-size:10px}
+  .choices label{min-height:38px;padding:4px 8px}
+  .sit svg{display:none}
+}
+@media(max-width:759px) and (max-height:700px){
+  .stage{height:33dvh;min-height:170px}
+  .steps{display:none}
+  .step{display:none}
+}
+@media(min-width:760px) and (max-height:700px){
+  .dirs small{display:none}
+  .dirs label{min-height:40px}
+  .panelwrap{padding:10px 12px}
+  .sub{display:none}
+}
 </style>
 </head>
 <body>
+<div class="app" data-step="1">
 <header class="top">
   <span class="tag">중1 · 입체도형</span>
   <h1>정육면체를 한 번 자르면? <span>단면 탐험</span></h1>
-  <p class="sub">단면(斷面) = 물체를 자를 때 드러나는 면(자른 면)이에요.</p>
+  <p class="sub">단면(斷面) = 물체를 자를 때 드러나는 면(자른 면)</p>
 </header>
 
-<noscript><p style="max-width:1100px;margin:10px auto;padding:0 16px;color:var(--yellow)">이 페이지는 자바스크립트를 켜야 실험할 수 있어요.</p></noscript>
+<noscript><p style="padding:0 16px;color:var(--gold)">이 페이지는 자바스크립트를 켜야 실험할 수 있어요.</p></noscript>
 
-<main class="wrap">
-
-<!-- STEP 1·2 -->
-<section class="card" id="cardA" aria-labelledby="hA">
-  <h2 id="hA"><span class="step">STEP 1·2</span> 상황과 예측 질문</h2>
-  <p><b>상황:</b> 간식 가게에서 <span class="word">정육면체</span>(여섯 면이 모두 합동인 정사각형인 입체) 모양 얼음 블록을 평평한 칼날로 <b>한 번에 쓱</b> 자릅니다. 칼날이 지나간 자리에 <span class="word">단면</span>(자른 면)이 생겨요.</p>
-  <figure>
-    <svg viewBox="0 0 300 240" role="img" aria-label="정육면체를 여섯 모서리의 가운데 점을 지나는 평면으로 자르면 육각형 단면이 생기는 그림">
-      <g stroke="#CDBBD8" stroke-width="2" fill="none" stroke-linejoin="round">
-        <polygon points="150,30 227.9,75 227.9,165 150,210 72.06,165 72.06,75"/>
-        <path d="M150,120 L227.9,75 M150,120 L72.06,75 M150,120 L150,210"/>
-        <path d="M150,120 L227.9,165 M150,120 L72.06,165 M150,120 L150,30" stroke-dasharray="5 5" opacity=".6"/>
-      </g>
-      <polygon points="227.9,120 188.97,187.5 111.03,187.5 72.06,120 111.03,52.5 188.97,52.5" fill="rgba(255,61,127,.45)" stroke="#FF3D7F" stroke-width="3" stroke-linejoin="round"/>
-    </svg>
-    <figcaption>그림: 칼날이 지나간 자리(분홍색)가 단면이에요.</figcaption>
-  </figure>
-  <fieldset id="q1set">
-    <legend>예측 질문: 한 번 잘랐을 때 단면이 될 수 <u>없는</u> 도형은 무엇일까요?</legend>
-    <p class="hint">정○각형 = 변의 길이와 각의 크기가 모두 같은 ○각형</p>
-    <div class="choices">
-      <label><input type="radio" name="q1" value="1"><span>① 정삼각형 <small class="hint">(세 변이 모두 같아요)</small></span></label>
-      <label><input type="radio" name="q1" value="2"><span>② 정사각형 <small class="hint">(네 변이 모두 같고 네 각이 모두 직각이에요)</small></span></label>
-      <label><input type="radio" name="q1" value="3"><span>③ 정오각형</span></label>
-      <label><input type="radio" name="q1" value="4"><span>④ 정육각형</span></label>
-    </div>
-  </fieldset>
-  <p id="guessMsg" class="hint">답을 고르면 실험을 시작할 수 있어요.</p>
-  <div class="row"><button id="startBtn" type="button" disabled>🔬 실험 시작</button></div>
-</section>
-
-<!-- STEP 3 -->
-<section class="card" id="cardB" aria-labelledby="hB">
-  <h2 id="hB" tabindex="-1"><span class="step">STEP 3</span> 칼을 움직여 보는 실험</h2>
-  <p class="hint">미션: 자르는 방향을 바꾸고 칼 위치를 움직이면서 여러 가지 단면을 모아 보세요. 아래 칸에 <b>정오각형</b>도 열 수 있을까요?</p>
-  <fieldset id="labSet" disabled>
-  <div class="lab">
-    <div class="stage-col">
-      <div class="stage" id="stage">
-        <canvas id="cv" tabindex="0" aria-label="3D 정육면체. 마우스나 손가락으로 끌거나 화살표 키로 돌릴 수 있어요."></canvas>
-        <div id="noThree" class="nothree" hidden>3D 화면을 불러오지 못했어요. 인터넷 연결이나 기기 설정 때문일 수 있어요. 오른쪽(또는 아래)의 2D 그림과 설명으로 계속 학습할 수 있어요.</div>
+<main class="main">
+  <!-- 왼쪽: 3D -->
+  <div class="left">
+    <div class="stage" id="stage">
+      <canvas id="cv" tabindex="0" aria-label="3D 정육면체. 마우스나 손가락으로 끌거나 화살표 키로 돌릴 수 있어요."></canvas>
+      <svg id="sec2d" class="sec2d labonly" viewBox="0 0 240 240" role="img" aria-label="현재 단면을 2D로 그린 그림"></svg>
+      <div id="noThree" class="nothree" hidden>3D 화면을 불러오지 못했어요. 인터넷 연결이나 기기 설정 때문일 수 있어요. 설명, 문제, 2D 그림으로 계속 학습할 수 있어요.</div>
+      <span class="tip only3d">👆 끌어서 돌려 보세요 · 분홍색이 단면</span>
+      <p class="note">※ 칼날은 두께 없는 평면, 정육면체는 속이 꽉 찬 물체로 단순화했어요. 한 모서리 6 cm는 계산용 가정이에요.</p>
+      <div class="readout labonly" id="readout">
+        <div><small>칼이 지나간 면</small><b><span id="rFaces">-</span>개</b></div>
+        <div><small>단면의 모양</small><b id="rShape">-</b></div>
+        <div><small>단면의 넓이</small><b><span id="rArea">-</span> cm²</b></div>
       </div>
-      <p class="hint only3d" style="margin:8px 0 0">👆 마우스나 손가락으로 끌면 돌아가요. 분홍색이 단면이에요.</p>
     </div>
+    <ul class="chips labonly" id="chips"></ul>
+  </div>
 
-    <div class="ctrl-col">
-      <fieldset>
-        <legend>① 자르는 방향 고르기</legend>
-        <div class="dirs" role="radiogroup">
-          <label><input type="radio" name="dir" value="0"><b>면과 나란하게</b><small>케이크를 가로로 썰듯이</small></label>
-          <label><input type="radio" name="dir" value="1"><b>모서리 방향으로</b><small>세운 채 대각선으로</small></label>
-          <label><input type="radio" name="dir" value="2" checked><b>꼭짓점 쪽으로</b><small>뾰족한 꼭짓점을 향해 기울여</small></label>
-          <label><input type="radio" name="dir" value="3"><b>비스듬하게</b><small>어느 면과도 나란하지 않게</small></label>
+  <!-- 오른쪽: 단계 패널 -->
+  <div class="right">
+    <ol class="steps" aria-label="학습 단계">
+      <li data-s="1">1·2 예측</li><li data-s="3">3 실험</li><li data-s="4">4 정답</li><li data-s="5">5 적용</li>
+    </ol>
+    <div class="panelwrap" id="panelwrap">
+
+      <!-- STEP 1·2 -->
+      <section id="p1" aria-labelledby="h1p">
+        <h2 id="h1p" tabindex="-1"><span class="step">STEP 1·2</span> 상황과 예측</h2>
+        <div class="sit">
+          <svg viewBox="0 0 300 240" role="img" aria-label="정육면체를 평면으로 자르면 육각형 단면이 생기는 그림">
+            <g stroke="#C9B6E4" stroke-width="2" fill="none" stroke-linejoin="round">
+              <polygon points="150,30 227.9,75 227.9,165 150,210 72.06,165 72.06,75"/>
+              <path d="M150,120 L227.9,75 M150,120 L72.06,75 M150,120 L150,210"/>
+              <path d="M150,120 L227.9,165 M150,120 L72.06,165 M150,120 L150,30" stroke-dasharray="5 5" opacity=".6"/>
+            </g>
+            <polygon points="227.9,120 188.97,187.5 111.03,187.5 72.06,120 111.03,52.5 188.97,52.5" fill="rgba(255,182,201,.45)" stroke="#FFB6C9" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+          <p style="margin:0"><b>상황:</b> 간식 가게에서 <span class="word">정육면체</span>(여섯 면이 모두 합동인 정사각형인 입체) 얼음 블록을 평평한 칼날로 <b>한 번에 쓱</b> 자릅니다. 칼이 지나간 자리에 <span class="word">단면</span>(자른 면)이 생겨요.</p>
         </div>
-      </fieldset>
+        <fieldset id="q1set">
+          <legend>예측 질문: 한 번 잘랐을 때 단면이 될 수 <u>없는</u> 도형은?</legend>
+          <p class="hint" style="margin:0">정○각형 = 변의 길이와 각의 크기가 모두 같은 ○각형</p>
+          <div class="choices">
+            <label><input type="radio" name="q1" value="1"><span>① 정삼각형</span></label>
+            <label><input type="radio" name="q1" value="2"><span>② 정사각형</span></label>
+            <label><input type="radio" name="q1" value="3"><span>③ 정오각형</span></label>
+            <label><input type="radio" name="q1" value="4"><span>④ 정육각형</span></label>
+          </div>
+        </fieldset>
+        <p id="guessMsg" class="hint" style="margin:0">답을 고르면 실험을 시작할 수 있어요.</p>
+        <div class="row"><button id="startBtn" type="button" disabled>🔬 실험 시작</button></div>
+      </section>
 
-      <div class="slider">
-        <label for="sl"><b>② 칼의 위치</b> <span class="hint">(슬라이더를 움직여 보세요)</span></label>
-        <input id="sl" type="range" min="-96" max="96" step="1" value="0">
-        <div class="pos"><span>한쪽 끝</span><span id="posTxt">가운데 (0)</span><span>반대쪽 끝</span></div>
-      </div>
-
-      <div class="row">
-        <button id="pauseBtn" type="button" class="ghost only3d">⏸ 회전 멈추기</button>
-        <button id="resetBtn" type="button" class="ghost">↺ 처음으로</button>
-      </div>
-
-      <div class="readout" id="readout">
-        <div><span>칼이 지나간 면</span><b><span id="rFaces">-</span>개</b></div>
-        <div><span>단면의 모양</span><b id="rShape">-</b></div>
-        <div><span>단면의 넓이</span><b><span id="rArea">-</span> cm²</b></div>
+      <!-- STEP 3 -->
+      <section id="p3" aria-labelledby="h3p" hidden>
+        <h2 id="h3p" tabindex="-1"><span class="step">STEP 3</span> 칼을 움직여 보는 실험</h2>
+        <p class="hint desk" style="margin-top:0">방향을 고르고 칼을 움직이며 단면을 모아 보세요. 🔒 <b>정오각형</b> 칸도 열 수 있을까요?</p>
         <p class="rule">규칙: 단면의 변의 수 = 칼이 지나간 면의 수</p>
-      </div>
+        <fieldset>
+          <legend>① 자르는 방향</legend>
+          <div class="dirs" role="radiogroup">
+            <label><input type="radio" name="dir" value="0" checked><b>면과 나란하게</b><small>케이크를 가로로 썰듯이</small></label>
+            <label><input type="radio" name="dir" value="1"><b>모서리 방향으로</b><small>세운 채 대각선으로</small></label>
+            <label><input type="radio" name="dir" value="2"><b>꼭짓점 쪽으로</b><small>뾰족한 꼭짓점을 향해</small></label>
+            <label><input type="radio" name="dir" value="3"><b>비스듬하게</b><small>어느 면과도 나란하지 않게</small></label>
+          </div>
+        </fieldset>
+        <div class="slider">
+          <label for="sl"><b>② 칼의 위치</b> <span class="hint">슬라이더를 움직여 보세요</span></label>
+          <input id="sl" type="range" min="-96" max="96" step="1" value="0">
+          <div class="pos"><span>한쪽 끝</span><span id="posTxt">가운데 (0)</span><span>반대쪽 끝</span></div>
+        </div>
+        <div class="row">
+          <button id="revealBtn" type="button">✅ 정답 보기</button>
+          <button id="pauseBtn" type="button" class="ghost only3d">⏸ 회전 멈추기</button>
+          <button id="resetBtn" type="button" class="ghost">↺ 처음으로</button>
+        </div>
+      </section>
 
-      <div class="sec2d">
-        <svg id="sec2d" viewBox="0 0 240 240" role="img" aria-label="현재 단면을 2D로 그린 그림"></svg>
-        <p class="hint" style="flex:1;min-width:150px">2D 그림: 단면의 변이 몇 개인지 세어 보세요!</p>
-      </div>
+      <!-- STEP 4 -->
+      <section id="p4" aria-labelledby="h4p" hidden>
+        <h2 id="h4p" tabindex="-1"><span class="step">STEP 4</span> 정답과 이유</h2>
+        <div class="ans">
+          <h3>정답: ③ 정오각형</h3>
+          <p id="myResult" style="margin:2px 0 0"></p>
+        </div>
+        <p style="margin:6px 0 0"><b>왜 정오각형은 안 될까요?</b></p>
+        <ul class="tight">
+          <li>마주 보는 두 면은 <span class="word">평행</span>(서로 만나지 않고 나란함)해요. 칼이 평행한 두 면을 지나면 단면의 두 변도 평행해요.</li>
+          <li>오각형 단면은 6개 면 중 5개를 지나서, 평행한 변이 <b>2쌍</b> 생겨요. 정오각형은 평행한 변이 없어서 불가능해요.</li>
+        </ul>
+        <p style="margin:6px 0 0"><b>다른 보기는 왜 가능할까요?</b></p>
+        <ul class="tight">
+          <li>① 정삼각형: <b>꼭짓점 쪽으로</b> 기울여 한 꼭짓점 가까이를 자르면 나와요.</li>
+          <li>② 정사각형: <b>면과 나란하게</b> 자르면 언제나 나와요.</li>
+          <li>④ 정육각형: <b>꼭짓점 쪽으로</b>, 칼 위치 <b>정확히 0</b>일 때 나와요. 조금만 벗어나도 정육각형이 아니에요.</li>
+        </ul>
+        <details>
+          <summary>더 알아보기 · 계산 검산</summary>
+          <p class="hint">면이 6개뿐이라 단면의 변은 최대 6개예요. 칠각형 이상은 없어요. 삼각형 단면은 세 각이 모두 예각(90°보다 작은 각)이라 직각·둔각삼각형도 없어요.</p>
+          <p class="hint">검산: 꼭짓점 쪽으로, 위치 0이면 정육각형이에요. 한 변 = 6√2 ÷ 2 = 3√2 cm, 넓이 = 6 × (√3/4) × (3√2)² = 27√3 ≈ <b>46.8 cm²</b>. 실험에서 방향 <b>꼭짓점 쪽으로</b>, 슬라이더 <b>0</b>에 맞추면 화면에도 46.8이 나와요.</p>
+        </details>
+        <div class="row">
+          <button id="toApplyBtn" type="button">적용 문제 풀기 ▶</button>
+          <button id="backBtn" type="button" class="ghost">← 실험으로</button>
+        </div>
+      </section>
 
-      <p style="margin:12px 0 2px"><b>모은 단면</b> <span class="hint">(한 번이라도 나오면 불이 켜져요)</span></p>
-      <ul class="chips" id="chips"></ul>
+      <!-- STEP 5 -->
+      <section id="p5" aria-labelledby="h5p" hidden>
+        <h2 id="h5p" tabindex="-1"><span class="step">STEP 5</span> 다른 상황에 적용하기</h2>
+        <p style="margin-top:0"><b>상황:</b> 가로·세로·높이가 서로 다른 <span class="word">직육면체</span>(직사각형 6개로 둘러싸인 입체) 모양 두부를 칼로 한 번 곧게 자릅니다.</p>
+        <fieldset>
+          <legend>단면이 될 수 있는 도형의 변은 <u>최대</u> 몇 개일까요?</legend>
+          <div class="choices">
+            <label><input type="radio" name="q2" value="1"><span>① 4개</span></label>
+            <label><input type="radio" name="q2" value="2"><span>② 5개</span></label>
+            <label><input type="radio" name="q2" value="3"><span>③ 6개</span></label>
+            <label><input type="radio" name="q2" value="4"><span>④ 7개</span></label>
+          </div>
+        </fieldset>
+        <div class="row"><button id="check2" type="button">답 확인</button></div>
+        <div class="ans" id="ans2" hidden>
+          <h3>정답: ③ 6개</h3>
+          <p id="myResult2" style="margin:2px 0"></p>
+          <ul class="tight">
+            <li>변의 수 = 지나간 면의 수예요. 직육면체도 면이 <b>6개</b>뿐이라 ④ 7개는 불가능해요.</li>
+            <li>알맞은 방향으로 자르면 6개 면을 모두 지날 수 있어서 최댓값은 6개예요.</li>
+            <li>① 4개, ② 5개도 나올 수 있지만 <b>가장 큰 값(최대)</b>은 아니에요.</li>
+          </ul>
+        </div>
+        <div class="row"><button id="resetAll" type="button" class="ghost">전체 처음부터 다시</button></div>
+      </section>
+
     </div>
   </div>
-  </fieldset>
-  <p class="note">※ 단순화한 조건: 칼날은 두께 없는 평평한 면(평면)이고, 정육면체는 속이 꽉 찬 단단한 물체라고 봅니다. 실제 얼음·두부는 칼날 두께 때문에 잘린 면이 조금 거칠고 두께만큼 줄어듭니다. 한 모서리가 6 cm라는 값은 넓이 계산을 위해 정한 가정입니다.</p>
-  <details>
-    <summary>계산 검산 예시 보기</summary>
-    <p>방향 <b>꼭짓점 쪽으로</b>, 칼 위치 <b>0(가운데)</b> → 단면은 정육각형이에요. 칼이 여섯 모서리의 가운데 점을 지나므로, 정육각형의 한 변은 정사각형 한 면의 대각선의 절반이에요.</p>
-    <p>한 변 = 6√2 ÷ 2 = 3√2 cm<br>넓이 = 6 × (√3/4) × (3√2)² = 6 × (√3/4) × 18 = 27√3 ≈ <b>46.8 cm²</b></p>
-    <p class="hint">실험에서 방향 <b>꼭짓점 쪽으로</b>, 슬라이더 <b>0</b>에 맞추면 화면에도 46.8 cm²가 나와요.</p>
-  </details>
-</section>
-
-<!-- STEP 4 -->
-<section class="card" id="cardC" aria-labelledby="hC">
-  <h2 id="hC"><span class="step">STEP 4</span> 정답 보기</h2>
-  <p class="hint">실험을 충분히 해 본 뒤에 눌러 보세요.</p>
-  <div class="row"><button id="revealBtn" type="button" disabled>✅ 정답 보기</button></div>
-  <div class="panel" id="answer" hidden>
-    <h3>정답: ③ 정오각형</h3>
-    <p id="myResult"></p>
-    <p><b>왜 정오각형은 안 될까요?</b></p>
-    <ul>
-      <li>정육면체에서 마주 보는 두 면은 <span class="word">평행</span>(서로 만나지 않고 나란함)해요. 평행한 두 면을 칼이 지나면 잘린 선(단면의 변)도 서로 평행해요.</li>
-      <li>오각형 단면은 6개 면 중 5개를 지나요. 마주 보는 면 3쌍 가운데 적어도 2쌍을 모두 지나므로, <b>평행한 변이 2쌍</b> 생겨요.</li>
-      <li>그런데 정오각형은 평행한 변이 하나도 없어요. 그래서 오각형은 나올 수 있어도 <b>정오각형은 나올 수 없어요.</b></li>
-    </ul>
-    <p><b>다른 보기는 왜 가능할까요?</b></p>
-    <ul>
-      <li>① 정삼각형: <b>꼭짓점 쪽으로</b> 기울여 한 꼭짓점 가까이를 자르면 나와요.</li>
-      <li>② 정사각형: <b>면과 나란하게</b> 자르면 언제나 나와요.</li>
-      <li>④ 정육각형: <b>꼭짓점 쪽으로</b>, 칼 위치 <b>정확히 0</b>일 때 나와요. (0에서 조금만 벗어나도 정육각형이 아닌 육각형이에요.)</li>
-    </ul>
-    <p class="note">더 알아보기: 면이 6개뿐이라 단면의 변은 최대 6개예요. 그래서 칠각형 이상은 나올 수 없어요. 단면이 삼각형이면 세 각이 모두 예각(90°보다 작은 각)이라서 직각삼각형, 둔각삼각형도 나올 수 없어요.</p>
-  </div>
-</section>
-
-<!-- STEP 5 -->
-<section class="card" id="cardD" aria-labelledby="hD">
-  <h2 id="hD"><span class="step">STEP 5</span> 다른 상황에 적용하기</h2>
-  <fieldset id="applySet" disabled>
-    <legend>단면이 될 수 있는 도형의 변은 <u>최대</u> 몇 개일까요?</legend>
-    <p><b>상황:</b> 가로·세로·높이가 서로 다른 <span class="word">직육면체</span>(직사각형 6개로 둘러싸인 입체) 모양 두부를 칼로 한 번 곧게 자릅니다.</p>
-    <div class="choices">
-      <label><input type="radio" name="q2" value="1"><span>① 4개</span></label>
-      <label><input type="radio" name="q2" value="2"><span>② 5개</span></label>
-      <label><input type="radio" name="q2" value="3"><span>③ 6개</span></label>
-      <label><input type="radio" name="q2" value="4"><span>④ 7개</span></label>
-    </div>
-    <div class="row"><button id="check2" type="button">답 확인</button></div>
-  </fieldset>
-  <p id="applyLock" class="hint">STEP 4에서 정답을 본 뒤에 풀 수 있어요.</p>
-  <div class="panel" id="ans2" hidden>
-    <h3>정답: ③ 6개</h3>
-    <p id="myResult2"></p>
-    <ul>
-      <li>단면의 변의 수 = 칼이 지나간 면의 수예요. 직육면체도 면이 <b>6개</b>라서 변은 6개를 넘을 수 없어요. ④ 7개는 불가능해요.</li>
-      <li>알맞은 방향으로 자르면 6개 면을 모두 지나갈 수 있어요. 그래서 최댓값은 6개예요.</li>
-      <li>① 4개, ② 5개도 나올 수 있는 값이지만 <b>가장 큰 값(최대)</b>은 아니에요.</li>
-    </ul>
-  </div>
-  <div class="row"><button id="resetAll" type="button" class="ghost">전체 처음부터 다시</button></div>
-</section>
-
 </main>
+</div>
 
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -360,75 +410,67 @@ function planeFor(dirN, s) {
 
 
 var DIRS=[
-  {n:[0,1,0],name:'면과 나란하게'},
-  {n:[1,0,1],name:'모서리 방향으로'},
-  {n:[1,1,1],name:'꼭짓점 쪽으로'},
-  {n:[1,4,2],name:'비스듬하게'}
+  {n:[0,1,0]},
+  {n:[1,0,1]},
+  {n:[1,1,1]},
+  {n:[1,4,2]}
 ];
-// 면 번호: 0:+x 오른쪽, 1:-x 왼쪽, 2:+y 윗면, 3:-y 아랫면, 4:+z 앞면, 5:-z 뒷면
-var FACE_NAMES=['오른쪽 면','왼쪽 면','윗면','아랫면','앞면','뒷면'];
-var FACE_HEX=['#ff5d73','#ff9f43','#3ddc84','#4de8e0','#4da3ff','#b48cff'];
 var SCALE2=9; // 한 모서리 2 -> 6 cm : 길이 x3, 넓이 x9
 var CHIPS=[['regtri','정삼각형'],['sq','정사각형'],['rect','직사각형'],['para','평행사변형'],['trap','사다리꼴'],['pent','오각형'],['reghex','정육각형']];
 
 function $(id){return document.getElementById(id);}
 var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var S={dir:0,s:0,step:1,unlocked:false,spin:!reduce,found:{},guess:null,cs:null,P:null,capsDirty:true};
 
-var S={dir:2,s:0,unlocked:false,sweep:false,sdir:1,spin:!reduce,explode:false,exp:0,found:{},guess:null,revealed:false,cs:null,P:null,capsDirty:true};
-
-/* ---------- 계산 + 화면(2D) ---------- */
-function sEff(){return Math.round(S.s);}
+/* ---------- 계산 + 2D 화면 ---------- */
 function compute(){
-  S.P=planeFor(DIRS[S.dir].n,sEff());
+  S.P=planeFor(DIRS[S.dir].n,Math.round(S.s));
   S.cs=crossSection(S.P.n,S.P.d);
   S.capsDirty=true;
 }
-function esc(x){return String(x);}
 function updateReadout(){
-  var cs=S.cs, s=sEff();
+  var cs=S.cs,s=Math.round(S.s);
   $('posTxt').textContent=(s===0?'가운데 (0)':(s>0?'+'+s:''+s));
-  if(!cs.n){
-    $('rFaces').textContent='0';$('rShape').textContent='닿지 않아요';$('rArea').textContent='-';return;
-  }
+  if(!cs.n){$('rFaces').textContent='0';$('rShape').textContent='닿지 않아요';$('rArea').textContent='-';return;}
   $('rFaces').textContent=cs.n;
-  var info=cs.info,t=info.name;
-  if(info.key==='pent')t+=' (정오각형은 아니에요)';
-  if(info.key==='hex')t+=' (정육각형은 아니에요)';
+  var t=cs.info.name;
+  if(cs.info.key==='pent')t+=' (정오각형 아님)';
+  if(cs.info.key==='hex')t+=' (정육각형 아님)';
   $('rShape').textContent=t;
   $('rArea').textContent=(cs.area*SCALE2).toFixed(1);
 }
 function updateSvg(){
   var cs=S.cs,svg=$('sec2d');
-  if(!cs.n){svg.innerHTML='<text x="120" y="125" text-anchor="middle" fill="#CDBBD8" font-size="15">칼이 닿지 않아요</text>';return;}
+  if(!cs.n){svg.innerHTML='<text x="120" y="125" text-anchor="middle" fill="#C9B6E4" font-size="15">닿지 않아요</text>';return;}
   var sc=62,cx=120,cy=120,P=[],i;
   for(i=0;i<cs.n;i++){var q=vsub(cs.pts[i],cs.c);P.push([cx+dot(q,cs.u)*sc,cy-dot(q,cs.v)*sc]);}
-  var h='<polygon points="'+P.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="rgba(255,61,127,.35)"/>';
-  for(i=0;i<cs.n;i++){var a=P[i],b=P[(i+1)%cs.n];
-    h+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke="#ff3d7f" stroke-width="5" stroke-linecap="round"/>';}
-  for(i=0;i<cs.n;i++)h+='<circle cx="'+P[i][0].toFixed(1)+'" cy="'+P[i][1].toFixed(1)+'" r="3.5" fill="#fff"/>';
+  var h='<polygon points="'+P.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1);}).join(' ')+'" fill="rgba(255,182,201,.4)" stroke="#FFB6C9" stroke-width="5" stroke-linejoin="round"/>';
+  for(i=0;i<cs.n;i++)h+='<circle cx="'+P[i][0].toFixed(1)+'" cy="'+P[i][1].toFixed(1)+'" r="4" fill="#FFF9FB"/>';
   svg.innerHTML=h;
 }
 function buildChips(){
-  var h='';
-  for(var i=0;i<CHIPS.length;i++)h+='<li data-k="'+CHIPS[i][0]+'">'+CHIPS[i][1]+'</li>';
-  h+='<li class="lock" data-k="regpent">🔒 정오각형</li>';
+  var h='<li class="lbl">모은 단면</li>';
+  for(var i=0;i<CHIPS.length;i++)h+='<li class="c" data-k="'+CHIPS[i][0]+'">'+CHIPS[i][1]+'</li>';
+  h+='<li class="c lock" data-k="regpent">🔒 정오각형</li>';
   $('chips').innerHTML=h;
 }
 function updateChips(){
   if(S.cs&&S.cs.n&&S.unlocked)S.found[S.cs.info.key]=true;
-  var lis=$('chips').children;
-  for(var i=0;i<lis.length;i++){var k=lis[i].getAttribute('data-k');
-    if(k==='regpent'){if(S.found.regpent){lis[i].className='on';lis[i].textContent='✔ 정오각형';}continue;}
-    var on=!!S.found[k];lis[i].className=on?'on':'';
-    var base=CHIPS.filter(function(c){return c[0]===k;})[0][1];
-    lis[i].textContent=(on?'✔ ':'')+base;}
+  var lis=$('chips').querySelectorAll('li.c');
+  for(var i=0;i<lis.length;i++){
+    var k=lis[i].getAttribute('data-k');
+    if(k==='regpent'){if(S.found.regpent){lis[i].className='c on';lis[i].textContent='✔ 정오각형';}continue;}
+    var on=!!S.found[k];
+    lis[i].className='c'+(on?' on':'');
+    lis[i].textContent=(on?'✔ ':'')+CHIPS.filter(function(c){return c[0]===k;})[0][1];
+  }
 }
 function changed(){compute();updateReadout();updateSvg();updateChips();}
 
 /* ---------- 3D (Three.js) ---------- */
 var T=null,R=null,scene,cam,ready=false,dragging=false;
-var orbit={theta:0.75,phi:1.05,r:8.6,dirty:true};
-var lowerG,upperG,knife,capLow,capUp,pLow,pUp,geoCyl,geoSph,matFace=[],matWhite;
+var orbit={theta:0.75,phi:1.05,r:8.2,dirty:true};
+var lowerG,upperG,knife,capG,pLow,pUp,geoCyl,matWhite;
 
 function fail3d(){
   document.body.classList.add('no3d');
@@ -445,32 +487,29 @@ function init3D(){
     scene=new T.Scene();
     cam=new T.PerspectiveCamera(38,1,0.1,100);
     scene.add(cam);
-    scene.add(new T.AmbientLight(0xffffff,0.8));
-    var pl=new T.PointLight(0xffffff,0.75);pl.position.set(3,4,3);cam.add(pl);
+    scene.add(new T.AmbientLight(0xffffff,0.85));
+    var pl=new T.PointLight(0xffffff,0.7);pl.position.set(3,4,3);cam.add(pl);
 
     pLow=new T.Plane(new T.Vector3(0,-1,0),0);
     pUp=new T.Plane(new T.Vector3(0,1,0),0);
     var box=new T.BoxGeometry(2,2,2);
     var edgesGeo=new T.EdgesGeometry(box);
-    var lowMat=new T.MeshLambertMaterial({color:0x6f86b8,clippingPlanes:[pLow]});
-    var upMat=new T.MeshLambertMaterial({color:0x6f86b8,transparent:true,opacity:0.2,depthWrite:false,side:T.DoubleSide,clippingPlanes:[pUp]});
-    matWhite=new T.MeshBasicMaterial({color:0xffffff});
+    var lowMat=new T.MeshLambertMaterial({color:0x8a86c9,clippingPlanes:[pLow]});
+    var upMat=new T.MeshLambertMaterial({color:0x8a86c9,transparent:true,opacity:0.2,depthWrite:false,side:T.DoubleSide,clippingPlanes:[pUp]});
+    matWhite=new T.MeshBasicMaterial({color:0xfff9fb});
     lowerG=new T.Group();upperG=new T.Group();
     lowerG.add(new T.Mesh(box,lowMat));
-    lowerG.add(new T.LineSegments(edgesGeo,new T.LineBasicMaterial({color:0xffffff,clippingPlanes:[pLow]})));
+    lowerG.add(new T.LineSegments(edgesGeo,new T.LineBasicMaterial({color:0xfff9fb,clippingPlanes:[pLow]})));
     upperG.add(new T.Mesh(box,upMat));
-    upperG.add(new T.LineSegments(edgesGeo,new T.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0.55,clippingPlanes:[pUp]})));
+    upperG.add(new T.LineSegments(edgesGeo,new T.LineBasicMaterial({color:0xfff9fb,transparent:true,opacity:0.55,clippingPlanes:[pUp]})));
     scene.add(lowerG);scene.add(upperG);
 
-    var kg=new T.PlaneGeometry(4.2,4.2);
-    knife=new T.Group();
-    knife.add(new T.Mesh(kg,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.07,side:T.DoubleSide,depthWrite:false})));
+    var kg=new T.PlaneGeometry(3.8,3.8);
+    knife=new T.Mesh(kg,new T.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.045,side:T.DoubleSide,depthWrite:false}));
     scene.add(knife);
 
-    geoCyl=new T.CylinderGeometry(0.045,0.045,1,8);
-    geoSph=new T.SphereGeometry(0.075,12,8);
-    capLow=new T.Group();capUp=new T.Group();
-    scene.add(capLow);scene.add(capUp);
+    geoCyl=new T.CylinderGeometry(0.04,0.04,1,8);
+    capG=new T.Group();scene.add(capG);
     ready=true;
     resize();
     update3D(true);
@@ -498,21 +537,18 @@ function fillCap(g){
   for(i=0;i<cs.n;i++){var a=cs.pts[i],b=cs.pts[(i+1)%cs.n];pos.push(c[0],c[1],c[2],a[0],a[1],a[2],b[0],b[1],b[2]);}
   var geo=new T.BufferGeometry();
   geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));
-  var fan=new T.Mesh(geo,new T.MeshBasicMaterial({color:0xff3d7f,side:T.DoubleSide,transparent:true,opacity:0.92,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+  var fan=new T.Mesh(geo,new T.MeshBasicMaterial({color:0xffb6c9,side:T.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
   fan.userData.own=true;g.add(fan);
   for(i=0;i<cs.n;i++)g.add(edgeMesh(cs.pts[i],cs.pts[(i+1)%cs.n],matWhite));
 }
 function update3D(force){
   if(!ready||!S.P)return;
-  var n=S.P.n,d=S.P.d,e=S.exp;
+  var n=S.P.n,d=S.P.d;
   pLow.set(new T.Vector3(-n[0],-n[1],-n[2]),d);
-  pUp.set(new T.Vector3(n[0],n[1],n[2]),-(d+e));
-  upperG.position.set(n[0]*e,n[1]*e,n[2]*e);
-  knife.position.set(n[0]*(d+e/2),n[1]*(d+e/2),n[2]*(d+e/2));
+  pUp.set(new T.Vector3(n[0],n[1],n[2]),-d);
+  knife.position.set(n[0]*d,n[1]*d,n[2]*d);
   knife.quaternion.setFromUnitVectors(new T.Vector3(0,0,1),new T.Vector3(n[0],n[1],n[2]));
-  if(S.capsDirty||force){fillCap(capLow);fillCap(capUp);S.capsDirty=false;}
-  capUp.position.set(n[0]*e,n[1]*e,n[2]*e);
-  capUp.visible=e>0.05;
+  if(S.capsDirty||force){fillCap(capG);S.capsDirty=false;}
   orbit.dirty=true;
 }
 function render(){
@@ -538,29 +574,33 @@ function rotate(dx,dy){
 
 /* ---------- 움직임 루프 ---------- */
 var last=performance.now();
-function setPauseLabel(){
-  $('pauseBtn').textContent=S.spin?'⏸ 회전 멈추기':'▶ 회전 켜기';
-}
+function setPauseLabel(){$('pauseBtn').textContent=S.spin?'⏸ 회전 멈추기':'▶ 회전 켜기';}
 function tick(now){
   requestAnimationFrame(tick);
   var dt=Math.min(0.05,(now-last)/1000);last=now;
   if(document.hidden)return;
-  var upd=false;
-  if(S.sweep&&S.unlocked){
-    S.s+=S.sdir*30*dt;
-    if(S.s>90){S.s=90;S.sdir=-1;}
-    if(S.s<-90){S.s=-90;S.sdir=1;}
-    $('sl').value=Math.round(S.s);
-    changed();upd=true;
-  }
   if(S.spin&&!dragging){orbit.theta+=0.3*dt;orbit.dirty=true;}
-  var target=S.explode?1.3:0;
-  if(Math.abs(S.exp-target)>0.002){S.exp+=(target-S.exp)*Math.min(1,dt*8);upd=true;}
-  else if(S.exp!==target){S.exp=target;upd=true;}
-  if(ready){
-    if(upd)update3D();
-    if(orbit.dirty){orbit.dirty=false;render();}
+  if(ready&&orbit.dirty){orbit.dirty=false;render();}
+}
+
+/* ---------- 단계 이동 ---------- */
+function goStep(n,quiet){
+  S.step=n;
+  var ids=[1,3,4,5],i;
+  for(i=0;i<ids.length;i++)$('p'+ids[i]).hidden=(ids[i]!==n);
+  var lis=document.querySelectorAll('.steps li');
+  for(i=0;i<lis.length;i++){
+    var v=+lis[i].getAttribute('data-s');
+    lis[i].className=(v===n)?'cur':(v<n?'done':'');
+    if(v===n)lis[i].setAttribute('aria-current','step');else lis[i].removeAttribute('aria-current');
   }
+  document.querySelector('.app').setAttribute('data-step',n);
+  $('panelwrap').scrollTop=0;
+  if(!quiet){
+    var h=$('p'+n).querySelector('h2');if(h)h.focus({preventScroll:true});
+    if(window.innerWidth<900)$('panelwrap').scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+  }
+  resize();
 }
 
 /* ---------- 조작 연결 ---------- */
@@ -568,13 +608,14 @@ function setDirRadio(v){
   var rs=document.getElementsByName('dir');
   for(var i=0;i<rs.length;i++)rs[i].checked=(+rs[i].value===v);
 }
-function stopSweep(){S.sweep=false;setPauseLabel();}
+var LABELS=['①','②','③','④'];
 function bind(){
   var rs=document.getElementsByName('dir'),i;
   for(i=0;i<rs.length;i++)rs[i].addEventListener('change',function(e){S.dir=+e.target.value;changed();update3D(true);});
-  $('sl').addEventListener('input',function(e){if(S.sweep)stopSweep();S.s=+e.target.value;changed();update3D();});
+  $('sl').addEventListener('input',function(e){S.s=+e.target.value;changed();update3D();});
   $('pauseBtn').addEventListener('click',function(){S.spin=!S.spin;setPauseLabel();});
   $('resetBtn').addEventListener('click',resetLab);
+
   var cv=$('cv'),lx=0,ly=0;
   cv.addEventListener('pointerdown',function(e){dragging=true;lx=e.clientX;ly=e.clientY;try{cv.setPointerCapture(e.pointerId);}catch(_){}});
   cv.addEventListener('pointermove',function(e){if(!dragging)return;rotate(-(e.clientX-lx)*0.01,-(e.clientY-ly)*0.01);lx=e.clientX;ly=e.clientY;});
@@ -591,34 +632,31 @@ function bind(){
   for(i=0;i<q1.length;i++)q1[i].addEventListener('change',function(e){
     S.guess=+e.target.value;
     $('startBtn').disabled=false;
-    $('guessMsg').textContent='선택한 답: '+['①','②','③','④'][S.guess-1]+'. 이제 실험으로 확인해 봐요!';
+    $('guessMsg').textContent='선택한 답: '+LABELS[S.guess-1]+'. 이제 실험으로 확인해 봐요!';
   });
   $('startBtn').addEventListener('click',function(){
-    S.unlocked=true;$('labSet').disabled=false;$('revealBtn').disabled=false;
-    $('q1set').disabled=true;$('startBtn').disabled=true;
-    changed();update3D(true);resize();
-    var h=$('hB');h.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});h.focus({preventScroll:true});
+    S.unlocked=true;$('q1set').disabled=true;
+    goStep(3);changed();update3D(true);
   });
   $('revealBtn').addEventListener('click',function(){
-    $('answer').hidden=false;
-    var labels=['①','②','③','④'];
     $('myResult').textContent=(S.guess===3)
-      ?'🎉 맞혔어요! 예측한 '+labels[2]+' 정오각형이 정답이에요.'
-      :'내 예측은 '+(S.guess?labels[S.guess-1]:'-')+'였어요. 실험에서 그 도형이 나왔다면 아주 좋은 발견이에요. 정답은 ③ 정오각형이에요.';
-    $('applySet').disabled=false;$('applyLock').hidden=true;
-    $('answer').scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'});
+      ?'🎉 맞혔어요! 예측한 ③ 정오각형이 정답이에요.'
+      :'내 예측은 '+(S.guess?LABELS[S.guess-1]:'-')+'였어요. 실험에서 그 도형이 나왔다면 좋은 발견이에요. 정답은 ③ 정오각형이에요.';
+    goStep(4);
   });
+  $('backBtn').addEventListener('click',function(){goStep(3);});
+  $('toApplyBtn').addEventListener('click',function(){goStep(5);});
   $('check2').addEventListener('click',function(){
     var v=null,r=document.getElementsByName('q2');
     for(var j=0;j<r.length;j++)if(r[j].checked)v=+r[j].value;
     if(v===null){alert('먼저 답을 골라 주세요.');return;}
     $('ans2').hidden=false;
-    $('myResult2').textContent=(v===3)?'🎉 정답이에요!':'아쉬워요. 선택한 '+['①','②','③','④'][v-1]+'는 정답이 아니에요. 아래 설명을 읽어 보세요.';
+    $('myResult2').textContent=(v===3)?'🎉 정답이에요!':'아쉬워요. 선택한 '+LABELS[v-1]+'는 정답이 아니에요. 아래 설명을 읽어 보세요.';
   });
   $('resetAll').addEventListener('click',resetAll);
 }
 function resetLab(){
-  S.dir=0;S.s=0;S.sweep=false;S.explode=false;S.exp=0;S.spin=!reduce;S.found={};
+  S.dir=0;S.s=0;S.spin=!reduce;S.found={};
   setDirRadio(0);$('sl').value=0;
   orbit.theta=0.75;orbit.phi=1.05;orbit.dirty=true;
   setPauseLabel();changed();update3D(true);
@@ -627,16 +665,16 @@ function resetAll(){
   var r=document.querySelectorAll('input[type=radio][name=q1],input[type=radio][name=q2]');
   for(var i=0;i<r.length;i++)r[i].checked=false;
   S.guess=null;S.unlocked=false;
-  $('q1set').disabled=false;$('startBtn').disabled=true;$('labSet').disabled=true;$('revealBtn').disabled=true;
+  $('q1set').disabled=false;$('startBtn').disabled=true;
   $('guessMsg').textContent='답을 고르면 실험을 시작할 수 있어요.';
-  $('answer').hidden=true;$('ans2').hidden=true;$('applySet').disabled=true;$('applyLock').hidden=false;
+  $('ans2').hidden=true;
   resetLab();
-  window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+  goStep(1);
 }
 
 /* ---------- 시작 ---------- */
 buildChips();bind();setPauseLabel();
-S.dir=0;setDirRadio(0);
+goStep(1,true);
 changed();
 requestAnimationFrame(tick);
 window.addEventListener('load',function(){init3D();});
